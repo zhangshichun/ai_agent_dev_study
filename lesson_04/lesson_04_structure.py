@@ -1,93 +1,109 @@
 import os
 import json
+import sys
 from dotenv import load_dotenv
 from openai import OpenAI
-# 引入 Pydantic 的核心组件
 from pydantic import BaseModel, Field
 
 # 加载环境变量
 load_dotenv()
+
+# 检查 API Key 是否存在，避免运行时才报错
+api_key = os.getenv("DEEP_SEEK_API_KEY")
+if not api_key:
+    print("❌ 错误: 未找到 DEEP_SEEK_API_KEY 环境变量，请检查 .env 文件")
+    sys.exit(1)
+
 client = OpenAI(
-    api_key=os.getenv("DEEP_SEEK_API_KEY"), 
+    api_key=api_key, 
     base_url=os.getenv("DEEP_SEEK_API_URL")
 )
 
 # ==========================================
-# 第一步：定义“模具” (Pydantic Model)
+# 第一步：定义“模具” (增加情感反馈字段)
 # ==========================================
 class AccountItem(BaseModel):
     amount: float = Field(description="交易金额，必须是数字。如果未提及金额，默认为 0.0")
-    # 在 description 中限制分类，AI 会非常听话地做选择题
-    category: str = Field(description="交易分类，只能从以下选择：[餐饮, 交通, 购物, 娱乐, 居家, 医疗, 其他]")
-    product: str = Field(description="具体的商品或服务名称，例如'牛肉面'、'滴滴打车'")
-    sentiment: str = Field(description="消费时的情绪，例如：happy, sad, neutral, painful(心疼)")
+    category: str = Field(description="交易分类，只能从以下选择：[餐饮, 交通, 购物, 娱乐, 居家, 医疗, 学习, 其他]")
+    product: str = Field(description="具体的商品或服务名称")
+    sentiment: str = Field(description="消费时的情绪，例如：开心, 后悔, 心疼, 期待, 平淡 等等，可以自行总结")
+    # 🔥 新增字段：AI 的情感反馈
+    ai_comment: str = Field(description="根据用户的消费内容和情绪，给出一句简短的反馈。如果是乱花钱可以幽默吐槽，如果是必要消费给予肯定，如果是心情不好则给予安慰。")
 
 # ==========================================
-# 第二步：编写处理函数
+# 第二步：处理函数
 # ==========================================
 def smart_bookkeeping(user_input):
-    # 1. 把 Pydantic 类转换成 AI 能读懂的 JSON Schema 描述
-    # ensure_ascii=False 是为了让中文正常显示，不变成 \uXXXX
     schema_str = json.dumps(AccountItem.model_json_schema(), ensure_ascii=False)
     
-    # 2. 构建 System Prompt (立规矩)
     system_prompt = f"""
-    你是一个专业的记账助手。
-    请分析用户的输入，提取关键信息。
+    你是一个不仅会记账，还很懂心理学的贴心助手。
+    请分析用户的输入，提取关键信息，并给出情感反馈。
     
     【重要规则】
-    1. 根据常识自动推断分类（如：'咖啡' -> '餐饮'）。
-    2. 严格按照以下 JSON Schema 格式输出 JSON 数据，禁止包含任何 markdown 标记或解释性文字：
+    1. 根据常识自动推断分类。
+    2. 严格按照以下 JSON Schema 格式输出 JSON 数据，禁止包含 markdown：
     {schema_str}
     """
 
-    print(f"🔄 正在分析账单: {user_input} ...")
+    print("🤖 正在思考中...", end="", flush=True) # 简单的加载动效
 
     try:
-        # 3. 调用大模型
         response = client.chat.completions.create(
             model="deepseek-chat", 
             messages=[
-                {"role": "system", "content": system_prompt}, # 注入规则
-                {"role": "user", "content": user_input}       # 注入数据
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_input}
             ],
-            # 【关键】强制模型进入 JSON 模式，防止它胡乱说话
             response_format={"type": "json_object"} 
         )
 
-        # 4. 获取结果字符串
         json_str = response.choices[0].message.content
-        
-        # 5. 【验证】将 JSON 字符串倒回 Pydantic 模具
-        # 如果格式不对，这一步会报错，保证了数据的安全性
         data = json.loads(json_str)
         item = AccountItem(**data)
-        
+        print("\r", end="") # 清除"正在思考中"
         return item
         
     except Exception as e:
-        print(f"❌ 解析失败: {e}")
+        print(f"\n❌ 解析失败: {e}")
         return None
 
 # ==========================================
-# 第三步：测试运行
+# 第三步：交互式 CLI (命令行界面)
 # ==========================================
 if __name__ == "__main__":
-    # 测试案例 1
-    text1 = "刚才打车回家花了 35.5，心疼死了"
-    result1 = smart_bookkeeping(text1)
-    if result1:
-        # 此时 result1 已经是一个标准的 Python 对象，可以点出属性
-        print(f"✅ 记账成功：")
-        print(f"   - 商品: {result1.product}")
-        print(f"   - 金额: {result1.amount}")
-        print(f"   - 分类: {result1.category}") # AI 会自动推断这是交通
-        print(f"   - 心情: {result1.sentiment}")
-    
-    print("-" * 30)
-    
-    # 测试案例 2
-    text2 = "周末和朋友去吃了顿海底捞，花了420"
-    result2 = smart_bookkeeping(text2)
-    if result2:
-        print(f"✅ 记账成功：[{result2.category}] {result2.product} ￥{result2.amount}")
+    print("=" * 40)
+    print("💰 智能记账助手 CLI 版 (输入 q 或 exit 退出)")
+    print("=" * 40)
+
+    while True:
+        try:
+            # 获取用户输入
+            user_input = input("\n📝 请输入账单描述: ").strip()
+            
+            # 退出条件
+            if user_input.lower() in ['q', 'quit', 'exit', '退出']:
+                print("👋 下次再见！")
+                break
+            
+            if not user_input:
+                continue
+
+            # 调用 AI
+            result = smart_bookkeeping(user_input)
+            
+            # 格式化输出结果
+            if result:
+                print(f"\n✅ 记账成功！")
+                print(f"   ---------------------------")
+                print(f"   🏷️  分类: {result.category}")
+                print(f"   🛒 商品: {result.product}")
+                print(f"   💰 金额: {result.amount:.2f}")
+                print(f"   💭 心情: {result.sentiment}")
+                print(f"   🤖 AI说: \033[96m{result.ai_comment}\033[0m") # 使用青色高亮显示 AI 回复
+                print(f"   ---------------------------")
+
+        except KeyboardInterrupt:
+            # 允许用户通过 Ctrl+C 优雅退出
+            print("\n👋 用户强制退出")
+            break
