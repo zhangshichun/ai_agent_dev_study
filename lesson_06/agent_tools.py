@@ -1,84 +1,109 @@
 import os
 import shutil
+import json
 
-# === 1. 配置操作目录 ===
-# 这里的文件夹名字必须和刚才 generate_files.py 生成的一致
-TARGET_DIR = "Agent测试文件库_最终版"
+# ==========================================
+# 1. 配置区域
+# ==========================================
+# ⚠️ 注意：这里的名字必须和 generate_files.py 生成的文件夹一致
+TARGET_DIR_NAME = "Agent测试文件库_最终版"
 
-# 确保脚本只操作这个子文件夹，避免误伤
-BASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), TARGET_DIR)
+# 获取当前脚本所在目录的绝对路径，锁定操作范围
+BASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), TARGET_DIR_NAME)
 
-# === 2. 工具函数定义 ===
+# ==========================================
+# 2. 工具函数定义 (修复版)
+# ==========================================
 
-def list_files(args):
+def list_files(args=None):
     """
-    获取目标文件夹中所有待整理的文件列表。
-    会忽略文件夹、隐藏文件和 Python 脚本。
+    获取目标文件夹下的所有文件名。
+    返回: JSON 格式的字符串
     """
+    # 安全检查
     if not os.path.exists(BASE_PATH):
-        return f"错误：找不到目录 {BASE_PATH}，请先运行生成文件的脚本。"
+        return json.dumps({
+            "error": f"找不到目录 {TARGET_DIR_NAME}，请先运行 generate_files.py 生成测试文件。"
+        }, ensure_ascii=False)
     
     files = []
-    for filename in os.listdir(BASE_PATH):
-        file_path = os.path.join(BASE_PATH, filename)
+    try:
+        for f in os.listdir(BASE_PATH):
+            f_path = os.path.join(BASE_PATH, f)
+            # 过滤逻辑：只看文件，忽略隐藏文件(.开头)
+            # 注意：这里放开了对 .py 的限制，以便测试更全面，但在真实环境中要小心
+            if os.path.isfile(f_path) and not f.startswith('.'):
+                files.append(f)
         
-        # 过滤条件：
-        # 1. 必须是文件 (os.path.isfile) -> 不处理已经存在的文件夹
-        # 2. 不处理 .py 结尾的脚本 -> 防止把 agent 代码自己移走了
-        # 3. 不处理 . 开头的隐藏文件 -> 比如 .DS_Store
-        if (os.path.isfile(file_path) and 
-            not filename.endswith(".py") and 
-            not filename.startswith(".")):
-            
-            files.append(filename)
-            
-    return files
+        # 必须返回 JSON 字符串，而不是 Python 列表
+        return json.dumps({"files": files}, ensure_ascii=False)
+        
+    except Exception as e:
+        return json.dumps({"error": str(e)}, ensure_ascii=False)
 
-def move_file(filename, category):
+def move_file(args):
     """
-    将文件移动到对应的分类文件夹中。
-    如果分类文件夹不存在，会自动创建。
+    移动文件到指定分类文件夹。
+    Args:
+        args (dict): 包含 'filename' 和 'category' 的字典
+    返回: JSON 格式的字符串
+    """
+    # 接收字典参数，手动提取，防止 TypeError
+    filename = args.get("filename")
+    category = args.get("category")
     
-    :param filename: 文件名 (例如 "张伟简历.pdf")
-    :param category: 分类名称 (例如 "简历", "图片", "财务")
-    """
-    source_path = os.path.join(BASE_PATH, filename)
+    if not filename or not category:
+        return json.dumps({"error": "参数缺失: 需要 filename 和 category"}, ensure_ascii=False)
+
+    source_file = os.path.join(BASE_PATH, filename)
     target_folder = os.path.join(BASE_PATH, category)
-    target_path = os.path.join(target_folder, filename)
+    target_file = os.path.join(target_folder, filename)
 
     try:
-        # 1. 检查源文件是否存在
-        if not os.path.exists(source_path):
-            return f"错误：文件 {filename} 不存在。"
+        # 检查源文件
+        if not os.path.exists(source_file):
+            return json.dumps({"error": f"文件不存在: {filename}"}, ensure_ascii=False)
 
-        # 2. 检查目标文件夹是否存在，不存在则创建
+        # 检查并创建目标目录
         if not os.path.exists(target_folder):
             os.makedirs(target_folder)
-
-        # 3. 移动文件
-        shutil.move(source_path, target_path)
-        return f"成功：已将 {filename} 移动到 {category} 文件夹。"
+            
+        # 移动文件
+        shutil.move(source_file, target_file)
+        
+        # 返回 JSON 字符串
+        return json.dumps({
+            "status": "success", 
+            "moved_to": category,
+            "filename": filename
+        }, ensure_ascii=False)
 
     except Exception as e:
-        return f"异常：移动 {filename} 时发生错误: {str(e)}"
+        return json.dumps({"error": str(e)}, ensure_ascii=False)
 
-# === 3. 定义工具箱 (给 AI 看的说明书) ===
+# ==========================================
+# 3. 工具导出 (Mapping & Schema)
+# ==========================================
 
+# 函数映射表 (供主程序调用)
+available_functions = {
+    "list_files": list_files,
+    "move_file": move_file
+}
+
+# 工具定义 (供 LLM 阅读)
 tools_schema = [
-    # --- 工具 1: 眼睛 (查看文件) ---
     {
         "type": "function",
         "function": {
             "name": "list_files",
-            "description": "获取当前待整理文件夹下的所有文件名列表。在开始整理前必须先调用此函数。",
+            "description": "查看当前文件夹里有哪些文件待处理。",
             "parameters": {
-                "type": "object",
-                "properties": {}, # 没有参数
+                "type": "object", 
+                "properties": {}
             }
         }
     },
-
-    # --- 工具 2: 手 (移动文件) ---
     {
         "type": "function",
         "function": {
@@ -89,11 +114,11 @@ tools_schema = [
                 "properties": {
                     "filename": {
                         "type": "string", 
-                        "description": "源文件名"
+                        "description": "源文件名 (必须是 list_files 返回列表中存在的名字)"
                     },
                     "category": {
                         "type": "string", 
-                        "description": "目标文件夹名称"
+                        "description": "目标文件夹名称 (例如 'Images', '合同文件', '简历')"
                     }
                 },
                 "required": ["filename", "category"]
@@ -101,10 +126,3 @@ tools_schema = [
         }
     }
 ]
-
-# --- 4. 【关键】导出函数映射表 ---
-# 这一步是为了让主程序可以通过字符串 "move_file" 找到函数对象 move_file
-available_functions = {
-    "list_files": list_files,
-    "move_file": move_file
-}
