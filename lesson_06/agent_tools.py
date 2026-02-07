@@ -31,7 +31,6 @@ def list_files(args=None):
         for f in os.listdir(BASE_PATH):
             f_path = os.path.join(BASE_PATH, f)
             # 过滤逻辑：只看文件，忽略隐藏文件(.开头)
-            # 注意：这里放开了对 .py 的限制，以便测试更全面，但在真实环境中要小心
             if os.path.isfile(f_path) and not f.startswith('.'):
                 files.append(f)
         
