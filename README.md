@@ -4,12 +4,17 @@ wx专栏: [春哥的AI Agent通关秘籍](https://mp.weixin.qq.com/mp/appmsgalbu
 
 # 单篇目录
 
-- [《01、什么是Agent开发》](https://mp.weixin.qq.com/s?__biz=MzI0NTAyNDMxMg==&mid=2468167068&idx=1&sn=c5a1d1aa6dd8ea76c20be629913d32b9&chksm=ffbd4ecbc8cac7ddde139fa9a91309e4ade8e8859ac96f98dfa4fee4b8ac25ea0cec79b4e201&scene=178&cur_album_id=4366020748964970507&search_click_id=#rd)
-- [《02、搭建环境及语言选择》](https://mp.weixin.qq.com/s?__biz=MzI0NTAyNDMxMg==&mid=2468167079&idx=1&sn=058bb94446ac6ece665a46aba515b87f&chksm=ffbd4ef0c8cac7e6bc93b1c64597bcfeb6f2eb8d3ace3eb67683345ebd90458e1f6356974fdc&scene=178&cur_album_id=4366020748964970507&search_click_id=#rd)
-- [《03、格式化输出》](https://mp.weixin.qq.com/s/Oqs-8Ng6oE3CNoAezA8KbA)
-- [《04、智能记账小秘书【实战篇】》](https://mp.weixin.qq.com/s/8rVOP2WhOZiAErz8WGTYfw)
-- [《05、工具调用 Function Calling【知识与思路篇】》](https://mp.weixin.qq.com/s/J51DTm4rv3DX_7TNjEBxww)
-- [《06、你的第一款AI思维范式ReAct》](https://mp.weixin.qq.com/s/iLoqTdBRjZmzWeyI2O7IuA)
+- [《01：什么是Agent开发》](https://mp.weixin.qq.com/s/F7O-hMFLmOnR7IWTvQSZ7g)
+- [《02：搭建环境及语言选择》](https://mp.weixin.qq.com/s/uxRFTudd0g-NoCHz7LbtvA)
+- [《03：格式化输出》](https://mp.weixin.qq.com/s/Oqs-8Ng6oE3CNoAezA8KbA)
+- [《04：智能记账小秘书【实战篇】》](https://mp.weixin.qq.com/s/8rVOP2WhOZiAErz8WGTYfw)
+- [《05：工具调用 Function Calling【知识与思路篇】》](https://mp.weixin.qq.com/s/J51DTm4rv3DX_7TNjEBxww)
+- [《06：你的第一款AI思维范式ReAct》](https://mp.weixin.qq.com/s/iLoqTdBRjZmzWeyI2O7IuA)
+- [《07：5分钟实现文件归类助手【实战】》](https://mp.weixin.qq.com/s/YR5LrqZJA5PUYM9d9CFdcA)
+- [《08：从【向量】到【句向量】》](https://mp.weixin.qq.com/s/dIdGRs5RPom6tFlOCnWg-g)
+- [《09：从【句向量】到RAG》](https://mp.weixin.qq.com/s/6KkoXd8H3aIc_5PXh73azA)
+- [《10：本地RAG实战（上）》](https://mp.weixin.qq.com/s/laEKF1o9d9GqATGeBCavRA)
+- [《11：本地RAG实战（中上）》](https://mp.weixin.qq.com/s/alpXPDLFVMV112C6g2_YQA)
 
 ## 如何启动本工程？
 
