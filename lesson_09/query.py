@@ -19,7 +19,7 @@ base_url = os.getenv("DEEP_SEEK_API_URL")
 llm_client = OpenAI(api_key=api_key, base_url=base_url)
 
 # ==========================================
-# 2. 准备向量数据库的连接 (带终极防弹补丁)
+# 2. 准备向量数据库的连接 
 # ==========================================
 class OllamaEmbeddingFunction:
     def __init__(self, model_name):
@@ -39,12 +39,11 @@ class OllamaEmbeddingFunction:
         return self.__call__(input)
 
 db_client = chromadb.PersistentClient(path=DB_PATH)
-embedding_func = OllamaEmbeddingFunction(model_name=MODEL_NAME)
 
 try:
     collection = db_client.get_collection(
         name=COLLECTION_NAME, 
-        embedding_function=embedding_func
+        embedding_function=OllamaEmbeddingFunction(model_name=MODEL_NAME)
     )
 except Exception as e:
     print("❌ 找不到集合，请确保你已经成功运行了入库脚本！")
