@@ -15,6 +15,9 @@ wx专栏: [春哥的AI Agent通关秘籍](https://mp.weixin.qq.com/mp/appmsgalbu
 - [《09：从【句向量】到RAG》](https://mp.weixin.qq.com/s/6KkoXd8H3aIc_5PXh73azA)
 - [《10：本地RAG实战（上）》](https://mp.weixin.qq.com/s/laEKF1o9d9GqATGeBCavRA)
 - [《11：本地RAG实战（中上）》](https://mp.weixin.qq.com/s/alpXPDLFVMV112C6g2_YQA)
+- [《12：本地RAG实战（中下）向量化与落库》](https://mp.weixin.qq.com/s/coNC3QlxAp09hzUz3HT8Wg)
+- [《13：本地RAG实战（下）实现查询》](https://mp.weixin.qq.com/s/coNC3QlxAp09hzUz3HT8Wg)
+- [《14：记忆才是Agent开发的核心》](https://mp.weixin.qq.com/s/5PKDx3ywtpR93Wa_9Y_d4g)
 
 ## 如何启动本工程？
 
