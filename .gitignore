@@ -1,2 +1,6 @@
 .env
 Agent测试文件库_最终版
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
