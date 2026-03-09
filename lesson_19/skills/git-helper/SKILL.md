@@ -53,5 +53,5 @@ description: Git 版本控制助手 - 提交、推送、分支管理
 更多 Git 最佳实践请参考：
 
 ```
-@../docs/git-workflow.md
+../docs/git-workflow.md
 ```

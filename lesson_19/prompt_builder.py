@@ -48,7 +48,7 @@ def build_skills_prompt(skill_indexes: List[SkillIndex]) -> str:
 
 3. **执行指令**: 读取 skill 后，按照其中的命令和说明执行任务
 
-4. **引用处理**: skill 文档中可能引用其他文档（使用 @路径 格式），如需读取可使用 `read_reference` 工具
+4. **引用处理**: skill 文档中可能引用其他文档（使用 路径 格式，如 ../docs/xxx.md），如需读取可使用 `read_reference` 工具
 
 ### 注意事项
 

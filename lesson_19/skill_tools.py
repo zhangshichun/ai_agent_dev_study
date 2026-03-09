@@ -58,12 +58,12 @@ def read_reference(skill_name: str, reference: str) -> str:
     """
     读取 skill 内部引用的文档。
 
-    在 skill 文档中可能会引用其他文档（如 @../docs/xxx.md），
+    在 skill 文档中可能会引用其他文档（如 ../docs/xxx.md），
     使用此工具解析并读取引用的内容。
 
     Args:
         skill_name: 当前 skill 的名称
-        reference: 引用路径，例如 "@../docs/git-workflow.md"
+        reference: 引用路径，例如 "../docs/git-workflow.md"
 
     Returns:
         引用的文档内容

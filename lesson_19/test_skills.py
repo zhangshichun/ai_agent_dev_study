@@ -155,7 +155,7 @@ def test_reference_resolution():
             f.write("# Test Doc\n\nThis is test reference content.")
 
         # Test reference resolution
-        result = skill_loader.resolve_reference("git-helper", "@../docs/test-ref.md")
+        result = skill_loader.resolve_reference("git-helper", "../docs/test-ref.md")
         print(f"\nReference resolution result: {result[:100]}...")
 
         # Cleanup
@@ -220,6 +220,37 @@ description: 这是一个测试 skill
     print("\n[PASS] Frontmatter parsing test passed")
 
 
+def test_folder_name_differs_from_skill_name():
+    """测试文件夹名与 skill name 不一致的情况"""
+    print("\n" + "=" * 60)
+    print("测试 10: 文件夹名与 Skill Name 不一致")
+    print("=" * 60)
+
+    # docker-helper 的文件夹名是 "docker"，但 skill name 在 frontmatter 里是 "docker-helper"
+    skill_name = "docker-helper"
+    folder_name = "docker"
+
+    print(f"\nSkill name: {skill_name}")
+    print(f"Folder name: {folder_name}")
+
+    # 验证索引加载正确
+    indexes = skill_loader.load_skill_index()
+    skill_names = [idx.name for idx in indexes]
+    print(f"Loaded skill names: {skill_names}")
+
+    assert skill_name in skill_names, f"Should have skill '{skill_name}' in index"
+
+    # 验证能通过 skill name 加载内容（即使文件夹名不同）
+    content = skill_loader.load_skill_content(skill_name)
+    print(f"Loaded content length: {len(content)} chars")
+
+    # 验证内容正确（包含 docker 相关命令）
+    assert "/docker-build" in content, "Should contain /docker-build command"
+    assert "/docker-run" in content, "Should contain /docker-run command"
+
+    print("\n[PASS] Folder name differs from skill name test passed")
+
+
 def test_all_skills_content():
     """测试所有 skills 的内容完整性"""
     print("\n" + "=" * 60)
@@ -266,6 +297,7 @@ def run_all_tests():
         test_reference_resolution()
         test_skill_caching()
         test_frontmatter_parsing()
+        test_folder_name_differs_from_skill_name()
         test_all_skills_content()
 
         print("\n" + "=" * 60)

@@ -37,5 +37,5 @@ description: 代码审查助手 - 审查代码质量、提出改进建议
 
 代码规范参考：
 ```
-@../docs/coding-standards.md
+../docs/coding-standards.md
 ```

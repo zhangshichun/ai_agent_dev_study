@@ -46,7 +46,7 @@ description: 文件操作助手 - 读取、写入、复制、移动文件
 你可以使用相对路径引用 skills 目录下的其他文档：
 
 ```
-@../docs/coding-standards.md
+../docs/coding-standards.md
 ```
 
 ### 执行命令

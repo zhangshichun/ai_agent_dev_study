@@ -99,10 +99,11 @@ description: Skill 描述
 
 ### 3. 引用文档
 
-在 SKILL.md 中使用 `@路径` 格式引用其他文档：
+在 SKILL.md 中使用 `相对路径` 格式引用其他文档：
 
 ```
-@../docs/git-workflow.md
+../docs/git-workflow.md
+docs/test_ref.md
 ```
 
 ## 工作流程

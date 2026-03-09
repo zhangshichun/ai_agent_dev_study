@@ -22,9 +22,14 @@ class SkillLoader:
     def __init__(self, skills_dir: str = "./skills"):
         self.skills_dir = Path(skills_dir)
         self._cache: Dict[str, str] = {}
+        self._indexes: List[SkillIndex] = []
 
     def load_skill_index(self) -> List[SkillIndex]:
-        """加载所有 skills 的索引"""
+        """加载所有 skills 的索引（带缓存）"""
+        # 如果已有缓存，直接返回
+        if self._indexes:
+            return self._indexes
+
         indexes = []
 
         if not self.skills_dir.exists():
@@ -48,6 +53,8 @@ class SkillLoader:
                 location=str(skill_md)
             ))
 
+        # 缓存索引到内存
+        self._indexes = indexes
         return indexes
 
     def load_skill_content(self, skill_name: str) -> str:
@@ -55,21 +62,23 @@ class SkillLoader:
         if skill_name in self._cache:
             return self._cache[skill_name]
 
-        # 查找 skill 目录
-        skill_dir = self.skills_dir / skill_name
-        if not skill_dir.exists():
-            # 尝试在所有 skill 中查找
-            for s in self.skills_dir.iterdir():
-                if s.is_dir() and s.name == skill_name:
-                    skill_dir = s
-                    break
+        # 先加载索引，直接使用索引中的 location
+        indexes = self.load_skill_index()
 
-        if not skill_dir.exists():
+        # 通过 name 查找对应的索引
+        target_index = None
+        for idx in indexes:
+            if idx.name == skill_name:
+                target_index = idx
+                break
+
+        if not target_index:
             raise FileNotFoundError(f"Skill not found: {skill_name}")
 
-        skill_md = skill_dir / "SKILL.md"
+        # 直接读取 location 指向的文件
+        skill_md = Path(target_index.location)
         if not skill_md.exists():
-            raise FileNotFoundError(f"SKILL.md not found for: {skill_name}")
+            raise FileNotFoundError(f"SKILL.md not found: {target_index.location}")
 
         content = skill_md.read_text(encoding='utf-8')
         # 去除 frontmatter，只保留正文
@@ -97,19 +106,24 @@ class SkillLoader:
 
     def resolve_reference(self, skill_name: str, reference: str) -> str:
         """
-        解析 skill 内部的引用（如 @../docs/xxx.md）
+        解析 skill 内部的引用（如 ../docs/xxx.md 或 docs/xxx.md）
         支持相对路径解析
         """
-        # 去除 @ 符号
-        ref_path = reference.lstrip('@').strip()
+        # 直接使用路径
+        ref_path = reference.strip()
 
-        # 获取 skill 所在目录
-        skill_dir = self.skills_dir / skill_name
-        if not skill_dir.exists():
-            return f"Error: Skill directory not found: {skill_name}"
+        # 通过索引获取 skill 的实际位置
+        indexes = self.load_skill_index()
+        target_index = next((idx for idx in indexes if idx.name == skill_name), None)
+
+        if not target_index:
+            return f"Error: Skill not found: {skill_name}"
+
+        # 使用 location 获取 skill 所在目录
+        skill_md_path = Path(target_index.location)
+        base_dir = skill_md_path.parent
 
         # 解析相对路径
-        base_dir = skill_dir.parent
         target_path = (base_dir / ref_path).resolve()
 
         if not target_path.exists():
