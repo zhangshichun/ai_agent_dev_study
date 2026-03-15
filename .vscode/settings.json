@@ -1,0 +1,18 @@
+{
+    "python.defaultInterpreterPath": "D:\\miniconda\\envs\\ai_agent\\python.exe",
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.inlayHintsFunctionReturnTypes": true,
+    "python.analysis.inlayHintsVariableTypes": true,
+    "python.languageServer": "Pylance",
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.python",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": "explicit"
+        }
+    },
+    "files.associations": {
+        "*.py": "python"
+    }
+}
