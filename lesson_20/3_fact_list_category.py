@@ -23,7 +23,7 @@ SYSTEM_PROMPT = """你是一个专业的信息提取专家，擅长从多轮对�
 
 我们需要你将提取的事实进行分类（category），可选的分类标签如下：
 1. preference (个人偏好、喜好习惯)
-2. short_term_goal (短期目标、当前具体的任务或项目)
+2. short_term_goal (短期目标、当前具体的任务或项目、用户目前想做的事)
 3. tech_stack (技术与工具栈、技能)
 4. fact (客观背景事实)
 
