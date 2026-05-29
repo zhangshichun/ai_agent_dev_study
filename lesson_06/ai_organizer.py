@@ -20,46 +20,6 @@ TARGET_DIR_NAME = "Agent测试文件库_最终版"
 # 获取脚本所在目录的绝对路径，确保不跑偏
 BASE_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), TARGET_DIR_NAME)
 
-def list_files(args=None):
-    """获取目标文件夹下的所有文件名"""
-    if not os.path.exists(BASE_PATH):
-        return json.dumps({"error": f"找不到目录 {TARGET_DIR_NAME}，请先运行生成脚本。"})
-    
-    files = []
-    # 遍历目录
-    for f in os.listdir(BASE_PATH):
-        f_path = os.path.join(BASE_PATH, f)
-        # 只看文件，忽略隐藏文件和Python脚本
-        if os.path.isfile(f_path) and not f.startswith('.'):
-            files.append(f)
-            
-    return json.dumps({"files": files}, ensure_ascii=False)
-
-def move_file(args):
-    """移动文件到指定分类文件夹"""
-    filename = args.get("filename")
-    category = args.get("category")
-    
-    if not filename or not category:
-        return json.dumps({"error": "参数缺失"})
-
-    source_file = os.path.join(BASE_PATH, filename)
-    target_folder = os.path.join(BASE_PATH, category)
-    target_file = os.path.join(target_folder, filename)
-
-    try:
-        if not os.path.exists(source_file):
-            return json.dumps({"error": f"文件 {filename} 不存在"})
-            
-        if not os.path.exists(target_folder):
-            os.makedirs(target_folder) # 自动创建分类文件夹
-            
-        shutil.move(source_file, target_file)
-        return json.dumps({"status": "success", "moved_to": category})
-    except Exception as e:
-        return json.dumps({"error": str(e)})
-
-
 # ==========================================
 # Agent 主程序 (大脑与循环)
 # ==========================================
