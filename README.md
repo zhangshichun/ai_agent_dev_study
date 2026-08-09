@@ -1,3 +1,5 @@
+
+
 # AI Agent 从0开始学习demo库
 
 wx专栏: [春哥的AI Agent通关秘籍](https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzI0NTAyNDMxMg==&action=getalbum&album_id=4366020748964970507#wechat_redirect)
@@ -31,7 +33,7 @@ DEEP_SEEK_API_URL = https://api.deepseek.com
 
 其中 `DEEP_SEEK_API_KEY` 是你申请的 `deepseek` 的api key。
 
-1. 执行命令(例子是power shell)
+3. 执行命令(例子是power shell)
 
 ```bash
 python .\lesson_03\lesson_03_structure.py
